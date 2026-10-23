@@ -32,3 +32,7 @@ docker run --rm -p 3000:3000 -e PORT=3000 myweb-proxy
 ```
 
 The server listens on `0.0.0.0` and exposes `/api/health` for readiness checks.
+
+## Vercel
+
+The `public/` directory contains the frontend. Vercel serves `api/proxy.js` at `/api/proxy` and `api/health.js` at `/api/health`; the proxy UI and rewritten page resources use the same `/api/proxy` route. Ensure the Vercel project is connected to this repository and deploys the `main` branch.

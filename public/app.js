@@ -33,7 +33,7 @@ form.addEventListener("submit", (event) => {
     const target = normalizeAddress(addressInput.value);
     openButton.disabled = true;
     openButton.querySelector("span").textContent = "Opening…";
-    window.location.assign(`/proxy?url=${encodeURIComponent(target.href)}`);
+    window.location.assign(`/api/proxy?url=${encodeURIComponent(target.href)}`);
   } catch (error) {
     errorMessage.textContent = error.message;
     errorMessage.hidden = false;

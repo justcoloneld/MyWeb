@@ -11,7 +11,7 @@
     "start": "node index.js",
     "dev": "node --watch index.js",
     "test": "node --test",
-    "check": "node --check index.js && node --check server/proxy.js && node --check public/app.js && node --check public/proxy-toolbar.js"
+    "check": "node --check index.js && node --check server/proxy.js && node --check public/app.js && node --check public/proxy-toolbar.js && node --check api/proxy.js && node --check api/health.js"
   },
   "dependencies": {
     "cheerio": "1.2.0",

@@ -47,7 +47,7 @@ const server = createServer(async (request, response) => {
     return;
   }
 
-  if (requestUrl.pathname === "/proxy") {
+  if (requestUrl.pathname === "/proxy" || requestUrl.pathname === "/api/proxy") {
     await handleProxy(request, response, requestUrl.searchParams.get("url"));
     return;
   }

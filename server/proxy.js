@@ -146,7 +146,7 @@ function destinationReferer(request) {
   try {
     const parsed = new URL(referer);
     const priorTarget = parsed.searchParams.get("url");
-    if (parsed.pathname === "/proxy" && priorTarget) {
+    if ((parsed.pathname === "/proxy" || parsed.pathname === "/api/proxy") && priorTarget) {
       const prior = parseDestination(priorTarget);
       return prior.href;
     }
@@ -194,7 +194,7 @@ async function readRequestBody(request) {
 }
 
 function proxyUrl(destination) {
-  return `/proxy?url=${encodeURIComponent(destination.href)}`;
+  return `/api/proxy?url=${encodeURIComponent(destination.href)}`;
 }
 
 function rewriteUrl(value, baseUrl) {

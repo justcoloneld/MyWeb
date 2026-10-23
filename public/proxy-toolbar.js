@@ -60,7 +60,7 @@
       const target = new URL(raw);
       if (target.protocol !== "http:" && target.protocol !== "https:") throw new Error("protocol");
       if (target.username || target.password) throw new Error("credentials");
-      window.location.assign(`/proxy?url=${encodeURIComponent(target.href)}`);
+      window.location.assign(`/api/proxy?url=${encodeURIComponent(target.href)}`);
     } catch {
       address.setCustomValidity("Enter a valid HTTP or HTTPS address.");
       address.reportValidity();
