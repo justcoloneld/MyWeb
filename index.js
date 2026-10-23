@@ -1,67 +1,82 @@
-import express from "express";
-import http from "node:http";
-import createBareServer from "@tomphttp/bare-server-node";
+import { createServer } from "node:http";
+import { readFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
 import path from "node:path";
-import * as dotenv from "dotenv";
-dotenv.config();
+import { handleProxy } from "./server/proxy.js";
 
-const __dirname = process.cwd();
-const server = http.createServer();
-const app = express(server);
-const bareServer = createBareServer("/outerspace/");
+const root = path.dirname(fileURLToPath(import.meta.url));
+const publicDirectory = path.join(root, "public");
+const contentTypes = {
+  "/": "text/html; charset=utf-8",
+  "/styles.css": "text/css; charset=utf-8",
+  "/app.js": "text/javascript; charset=utf-8",
+  "/proxy-toolbar.js": "text/javascript; charset=utf-8",
+  "/favicon.svg": "image/svg+xml",
+  "/manus-routes.json": "application/json; charset=utf-8",
+};
 
-app.use(express.json());
-app.use(
-  express.urlencoded({
-    extended: true,
-  })
-);
-
-app.use(express.static(path.join(__dirname, "static")));
-
-const routes = [
-  { path: "/", file: "index.html" },
-  { path: "/news", file: "apps.html" },
-  { path: "/algebra", file: "games.html" },
-  { path: "/settings", file: "settings.html" },
-  { path: "/tabs", file: "tabs.html" },
-  { path: "/tabinner", file: "tabinner.html" },
-  { path: "/go", file: "go.html" },
-  { path: "/loading", file: "loading.html" },
-  { path: "/404", file: "404.html" },
-];
-
-routes.forEach((route) => {
-  app.get(route.path, (req, res) => {
-    res.sendFile(path.join(__dirname, "static", route.file));
-  });
-});
-
-app.get("/*", (req, res) => {
-  res.redirect("/404");
-});
-
-// Bare Server 
-server.on("request", (req, res) => {
-  if (bareServer.shouldRoute(req)) {
-    bareServer.routeRequest(req, res);
-  } else {
-    app(req, res);
+async function sendFile(response, route, method = "GET") {
+  const fileName = route === "/" ? "index.html" : route.slice(1);
+  const filePath = path.join(publicDirectory, fileName);
+  try {
+    const body = await readFile(filePath);
+    response.writeHead(200, {
+      "content-type": contentTypes[route] ?? "application/octet-stream",
+      "cache-control": route === "/" ? "no-store" : "public, max-age=300",
+      "x-content-type-options": "nosniff",
+      "referrer-policy": "no-referrer",
+    });
+    response.end(method === "HEAD" ? undefined : body);
+  } catch {
+    response.writeHead(500, { "content-type": "text/plain; charset=utf-8" });
+    response.end("Application asset unavailable.");
   }
-});
+}
 
-server.on("upgrade", (req, socket, head) => {
-  if (bareServer.shouldRoute(req)) {
-    bareServer.routeUpgrade(req, socket, head);
-  } else {
-    socket.end();
+const server = createServer(async (request, response) => {
+  const method = request.method ?? "GET";
+  const requestUrl = new URL(request.url ?? "/", "http://localhost");
+
+  if (requestUrl.pathname === "/api/health" && (method === "GET" || method === "HEAD")) {
+    response.writeHead(200, {
+      "content-type": "application/json; charset=utf-8",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+    });
+    response.end(method === "HEAD" ? undefined : JSON.stringify({ ok: true, service: "myweb-proxy" }));
+    return;
   }
+
+  if (requestUrl.pathname === "/proxy") {
+    await handleProxy(request, response, requestUrl.searchParams.get("url"));
+    return;
+  }
+
+  if (method !== "GET" && method !== "HEAD") {
+    response.writeHead(405, { allow: "GET, HEAD", "content-type": "text/plain; charset=utf-8" });
+    response.end("Method not allowed.");
+    return;
+  }
+
+  if (Object.hasOwn(contentTypes, requestUrl.pathname)) {
+    await sendFile(response, requestUrl.pathname, method);
+    return;
+  }
+
+  response.writeHead(404, { "content-type": "text/plain; charset=utf-8", "x-content-type-options": "nosniff" });
+  response.end("Not found.");
 });
 
-server.on("listening", () => {
-  console.log(`MyWeb running at http://localhost:${process.env.PORT}`);
-});
+server.headersTimeout = 10_000;
+server.requestTimeout = 30_000;
+server.keepAliveTimeout = 5_000;
+server.maxRequestsPerSocket = 100;
 
-server.listen({
-  port: 8080,
+const port = Number(process.env.PORT || 3000);
+if (!Number.isInteger(port) || port < 1024 || port > 65535) {
+  throw new Error("PORT must be an integer between 1024 and 65535.");
+}
+
+server.listen(port, "0.0.0.0", () => {
+  console.log(`MyWeb Proxy listening on 0.0.0.0:${port}`);
 });

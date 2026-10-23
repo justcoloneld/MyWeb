@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b1116" />
+    <meta name="description" content="A straightforward web proxy for browsing public HTTP and HTTPS pages." />
+    <title>MyWeb Proxy — Browse the web</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="MyWeb Proxy home">
+        <span class="brand-mark" aria-hidden="true"><span></span></span>
+        <span>myweb<span class="brand-light">/proxy</span></span>
+      </a>
+      <div class="connection-state"><span class="state-dot" aria-hidden="true"></span><span>Proxy ready</span></div>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="page-title">
+        <div class="hero-copy">
+          <p class="eyebrow">A simpler route to the web</p>
+          <h1 id="page-title">Browse beyond<br /><span>the address bar.</span></h1>
+          <p class="lede">Enter a public website and open it through MyWeb Proxy. Your destination stays in the address bar while links and page resources continue through the proxy.</p>
+        </div>
+
+        <form id="proxy-form" class="address-form" novalidate>
+          <label for="destination">Website address</label>
+          <div class="address-row">
+            <span class="input-globe" aria-hidden="true">↗</span>
+            <input id="destination" name="destination" type="text" inputmode="url" autocomplete="url" autocapitalize="none" spellcheck="false" placeholder="https://example.com" aria-describedby="address-hint address-error" required />
+            <button id="open-button" type="submit"><span>Open website</span><span class="button-arrow" aria-hidden="true">→</span></button>
+          </div>
+          <p id="address-error" class="form-error" role="alert" hidden></p>
+          <p id="address-hint" class="form-hint">HTTP and HTTPS only. Private and local network addresses are blocked.</p>
+        </form>
+
+        <div class="feature-strip" aria-label="Proxy details">
+          <div class="feature"><span class="feature-index">01</span><span>Links rewritten<br />for proxy browsing</span></div>
+          <div class="feature"><span class="feature-index">02</span><span>Resource-aware<br />navigation controls</span></div>
+          <div class="feature"><span class="feature-index">03</span><span>Private network<br />targets blocked</span></div>
+        </div>
+      </section>
+
+      <section class="notice" aria-label="Privacy and security notice">
+        <div class="notice-icon" aria-hidden="true">i</div>
+        <div>
+          <h2>Use with care</h2>
+          <p>MyWeb fetches pages on your behalf. Proxied sites may see requests from the server hosting this app. Don’t enter sensitive credentials on a proxy you don’t control. This instance blocks local and private network destinations.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer"><span>MYWEB PROXY</span><span>Public HTTP(S) destinations only</span></footer>
+  </body>
+</html>

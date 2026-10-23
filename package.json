@@ -1,7 +1,21 @@
 {
-  "devDependencies": {
-    "eslint": "^8.36.0",
-    "prettier": "^2.8.4",
-    "expo-cli": "^7.0.0"
+  "name": "myweb-proxy",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20.18.1"
+  },
+  "packageManager": "npm@10.9.2",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "test": "node --test",
+    "check": "node --check index.js && node --check server/proxy.js && node --check public/app.js && node --check public/proxy-toolbar.js"
+  },
+  "dependencies": {
+    "cheerio": "1.2.0",
+    "ipaddr.js": "2.5.0",
+    "undici": "7.30.1"
   }
 }

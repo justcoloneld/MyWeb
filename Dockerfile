@@ -1,12 +1,13 @@
-FROM node:20.5.1-bullseye-slim
-ENV NODE_ENV=production
+FROM node:22.19-alpine
 
+ENV NODE_ENV=production
 WORKDIR /app
 
-COPY ["package.json", "./"]
-
-RUN npm install
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev && npm cache clean --force
 
 COPY . .
-
-CMD [ "node", "index.js" ]
+ENV PORT=3000
+EXPOSE 3000
+USER node
+CMD ["npm", "start"]
